@@ -3620,19 +3620,24 @@ int gameDirectionalAction(CoordActionInfo *info) {
 void gameDamageParty(int minDamage, int maxDamage) {
     int i;
     int damage;
+    int lastdmged = -1;
 
     for (i = 0; i < c->party->size(); i++) {
         if (xu4_random(2) == 0) {
             damage = ((minDamage >= 0) && (minDamage < maxDamage)) ?
                 xu4_random((maxDamage + 1) - minDamage) + minDamage :
                 maxDamage;
-            c->party->member(i)->applyDamage(damage);            
-            c->stats->highlightPlayer(i);            
+            c->party->member(i)->applyDamage(damage);
+            c->stats->highlightPlayer(i);
+            lastdmged = i;
+            EventHandler::wait_msecs(100);
         }
     }
     
-    EventHandler::wait_msecs(100);
-    screenShake(1);
+    screenShake(2);
+    
+    // Un-highlight the last player
+    if (lastdmged != -1) c->stats->highlightPlayer(lastdmged);
 }
 
 /**
