@@ -80,7 +80,7 @@
         <algorithm desc="Player hits creature" prec="exact">
             <line>(player.dex + 0x80) >= xu4_random(0x100)</line>
         </algorithm>
-        <algorithm desc="Player is disabled" prec="near">
+        <algorithm desc="Player is disabled" prec="exact">
             <line>(player.status == 'G') or (player.status == 'P')</line>
         </algorithm>
     </section>    
