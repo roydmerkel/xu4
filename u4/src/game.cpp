@@ -458,7 +458,7 @@ int gameSave() {
     c->location->map->fillMonsterTable(); /* fill the monster table so we can save it */
 
     if (!saveGameMonstersWrite(c->location->map->monsterTable, monstersFile)) {
-        screenMessage("Error opening monsters.sav\n");
+        screenMessage("Error writing to %s\n", MONSTERS_SAV_BASE_FILENAME);
         fclose(monstersFile);
         return 0;
     }
