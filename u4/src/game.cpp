@@ -337,7 +337,7 @@ void GameController::init() {
 
     TRACE_LOCAL(gameDbg, "Loading monsters."); ++pb;
 
-    /* load in creatures.sav */
+    /* load in monsters.sav */
     monstersFile = saveGameMonstersOpenForReading(MONSTERS_SAV_BASE_FILENAME);
     if (monstersFile) {
         saveGameMonstersRead(c->location->map->monsterTable, monstersFile);
@@ -405,7 +405,7 @@ void GameController::init() {
 }
 
 /**
- * Saves the game state into party.sav and creatures.sav.
+ * Saves the game state into party.sav and monsters.sav.
  */
 int gameSave() {
     FILE *saveGameFile, *monstersFile, *dngMapFile;
@@ -458,7 +458,7 @@ int gameSave() {
     c->location->map->fillMonsterTable(); /* fill the monster table so we can save it */
 
     if (!saveGameMonstersWrite(c->location->map->monsterTable, monstersFile)) {
-        screenMessage("Error opening creatures.sav\n");
+        screenMessage("Error opening monsters.sav\n");
         fclose(monstersFile);
         return 0;
     }
