@@ -337,7 +337,7 @@ void GameController::init() {
 
     TRACE_LOCAL(gameDbg, "Loading monsters."); ++pb;
 
-    /* load in creatures.sav */
+    /* load in monsters.sav */
     monstersFile = saveGameMonstersOpenForReading(MONSTERS_SAV_BASE_FILENAME);
     if (monstersFile) {
         saveGameMonstersRead(c->location->map->monsterTable, monstersFile);
@@ -405,7 +405,7 @@ void GameController::init() {
 }
 
 /**
- * Saves the game state into party.sav and creatures.sav.
+ * Saves the game state into party.sav and monsters.sav.
  */
 int gameSave() {
     FILE *saveGameFile, *monstersFile, *dngMapFile;
@@ -458,7 +458,7 @@ int gameSave() {
     c->location->map->fillMonsterTable(); /* fill the monster table so we can save it */
 
     if (!saveGameMonstersWrite(c->location->map->monsterTable, monstersFile)) {
-        screenMessage("Error opening creatures.sav\n");
+        screenMessage("Error writing to %s\n", MONSTERS_SAV_BASE_FILENAME);
         fclose(monstersFile);
         return 0;
     }
@@ -494,7 +494,18 @@ int gameSave() {
             id_map[creatures.getById(ROGUE_ID)]           = 15;
         }
 
+#ifdef MACOSX
+        // Mac OS X savegame files go in a set directory
+        char *home = getenv("HOME");
+        if (home && home[0]) {
+            string dngmapfname = home;
+            dngmapfname += MACOSX_USER_FILES_PATH;
+            dngmapfname += "/dngmap.sav";
+            dngMapFile = fopen(dngmapfname.c_str(), "wb");
+        } else dngMapFile = NULL;
+#else
         dngMapFile = fopen("dngmap.sav", "wb");
+#endif
         if (!dngMapFile) {
             screenMessage("Error opening dngmap.sav\n");
             return 0;
@@ -1290,15 +1301,10 @@ bool GameController::keyPressed(int key) {
             if (item) {
                 if (*item->isItemInInventory != NULL && (*item->isItemInInventory)(item->data))
                     screenMessage("Nothing Here!\n");
-                else {
-                    if ((((int)item->data) == ITEM_SKULL) && (c->saveGame->items & ITEM_SKULL_DESTROYED)) {
-                        // you can't find the skull again once it's destroyed */
-                        screenMessage("Nothing Here!\n");
-                    } else {
-                        if (item->name)
-                            screenMessage("You find...\n%s!\n", item->name);
-                        (*item->putItemInInventory)(item->data);
-                    }
+                else {                    
+                    if (item->name)
+                        screenMessage("You find...\n%s!\n", item->name);
+                    (*item->putItemInInventory)(item->data);                    
                 }
             } else
                 screenMessage("Nothing Here!\n");
@@ -1881,8 +1887,10 @@ bool gameSpecialCmdKeyHandler(int key, void *data) {
 
     case 'p':        
         eventHandler->popKeyHandler();
-        if (c->location->viewMode == VIEW_NORMAL)
+        if ((c->location->viewMode == VIEW_NORMAL) || (c->location->viewMode == VIEW_DUNGEON))
             c->location->viewMode = VIEW_GEM;
+        else if (c->location->context == CTX_DUNGEON)
+            c->location->viewMode = VIEW_DUNGEON;
         else c->location->viewMode = VIEW_NORMAL;
         
         screenMessage("\nToggle View!\n");
@@ -3618,19 +3626,24 @@ int gameDirectionalAction(CoordActionInfo *info) {
 void gameDamageParty(int minDamage, int maxDamage) {
     int i;
     int damage;
+    int lastdmged = -1;
 
     for (i = 0; i < c->party->size(); i++) {
         if (xu4_random(2) == 0) {
             damage = ((minDamage >= 0) && (minDamage < maxDamage)) ?
                 xu4_random((maxDamage + 1) - minDamage) + minDamage :
                 maxDamage;
-            c->party->member(i)->applyDamage(damage);            
-            c->stats->highlightPlayer(i);            
+            c->party->member(i)->applyDamage(damage);
+            c->stats->highlightPlayer(i);
+            lastdmged = i;
+            EventHandler::wait_msecs(100);
         }
     }
     
-    EventHandler::wait_msecs(100);
-    screenShake(1);
+    screenShake(2);
+    
+    // Un-highlight the last player
+    if (lastdmged != -1) c->stats->highlightPlayer(lastdmged);
 }
 
 /**

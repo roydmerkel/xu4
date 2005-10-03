@@ -879,4 +879,5 @@ Sources
 
 http://www.geocities.com/xenerkes/
 http://www.moongates.com/u4/Tech.asp
-Marc Winterrowd <nodling at yahoo dot com>
+Marc Winterrowd <remove space and vowels from "marc winterrowd"
+                 and append "at yahoo dot com">
