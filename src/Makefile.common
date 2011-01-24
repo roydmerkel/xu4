@@ -1,7 +1,7 @@
 NULL=
 MAIN=u4$(EXEEXT)
 
-VERSION=1.1svn
+VERSION=1.0beta4
 
 CSRCS=\
         lzw/hash.c \
