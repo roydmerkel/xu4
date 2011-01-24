@@ -46,6 +46,10 @@ New in v1.0beta4
  - more sound effects
  - support for multiple profiles/saved games
  - the traditional title sequence was implemented
+ - tracker-based music files have been generated to replace the midi
+ - spell/combat animations and sound effect timings have been tweaked
+ - dungeon rendering improved
+ - tile stacks and effects display transparencies  
 
 New in v1.0beta3
  - more bug fixes
