@@ -1,5 +1,5 @@
 Name:      xu4
-Version:   1.0beta3
+Version:   1.0beta4
 Release:   1
 Epoch:     0
 Summary:   xu4 - Ultima IV Recreated
